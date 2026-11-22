@@ -1,9 +1,4 @@
-package nuvem;
-
-
-	// Aluno : Misael Witalo
-	// RA: 0025369
-	// CRUD de produtos com banco de dados MySQL local
+package crud;
 
 	import java.sql.Connection;
 	import java.sql.DriverManager;
@@ -11,24 +6,26 @@ package nuvem;
 	import java.sql.ResultSet;
 	import java.util.Scanner;
 
-	// Autor: Danilo Castro
-	// RA: 0025322
-	// CRUD de produtos com banco de dados MySQL no Railway (nuvem)
-public class Produto {
+	// Aluno: Misael Witalo 
+	// RA: 0025369
+	// CRUD de produtos com banco de dados 
+
+	public class Produto {
 
 	    public static void main(String[] args) {
-	        // Conexão na nuvem (Railway - Rede Pública)
-	        String url = "jdbc:mysql://tramway.proxy.rlwy.net:30514/railway";
-	        String usuariobanco = "root";
-	        String bancosenha = "yrQKKezXYShchwZhrydBhCuLWKvJuydj";
+
+	        // Conexao local com H2 Database (cria o arquivo dbproduto.mv.db na pasta do projeto)
+	        String url = "jdbc:h2:./dbproduto";
+	        String usuariobanco = "sa";
+	        String bancosenha = "7657";
 
 	        Scanner sc = new Scanner(System.in);
 
 	        try {
 	            Connection conexao = DriverManager.getConnection(url, usuariobanco, bancosenha);
-	            System.out.println("Conectado ao banco na nuvem com sucesso!");
+	            System.out.println("Conectado ao banco local H2 com sucesso!");
 
-	            // Cria a tabela automaticamente, caso ainda não exista
+	            // Cria a tabela automaticamente, caso ainda nao exista
 	            String sqlTabela = "CREATE TABLE IF NOT EXISTS PRODUTO (" +
 	                               "CODIGO INT PRIMARY KEY, " +
 	                               "NOME VARCHAR(100), " +
@@ -45,7 +42,7 @@ public class Produto {
 	                    case 1:
 	                        System.out.print("Código do produto: ");
 	                        int codigo = sc.nextInt();
-	                        sc.nextLine(); // Limpa o buffer do teclado
+	                        sc.nextLine(); // Limpa o buffer do teclado para aceitar nomes com espaço
 
 	                        System.out.print("Nome do Produto: ");
 	                        String nome = sc.nextLine();
@@ -59,8 +56,6 @@ public class Produto {
 	                        stmt.setString(2, nome);
 	                        stmt.setFloat(3, preco);
 	                        stmt.executeUpdate();
-	                        stmt.close();
-
 	                        System.out.println("Registro inserido com sucesso!");
 	                        break;
 
@@ -74,12 +69,10 @@ public class Produto {
 	                        ResultSet rs = stmt2.executeQuery();
 
 	                        if (rs.next()) {
-	                            System.out.println("Nome Produto: " + rs.getString("NOME") + " | Preço: R$ " + rs.getFloat("PRECO"));
+	                            System.out.println("Nome Produto: " + rs.getString("nome") + " | Preço: R$ " + rs.getFloat("preco"));
 	                        } else {
 	                            System.out.println("Produto não localizado.");
 	                        }
-	                        rs.close();
-	                        stmt2.close();
 	                        break;
 
 	                    case 3:
@@ -93,14 +86,13 @@ public class Produto {
 	                        PreparedStatement stmtUp = conexao.prepareStatement(sqlUpd);
 	                        stmtUp.setFloat(1, novopreco);
 	                        stmtUp.setInt(2, codPesquisa);
-
 	                        int linhaAfetada = stmtUp.executeUpdate();
+
 	                        if (linhaAfetada > 0) {
 	                            System.out.println("Preço atualizado com sucesso!");
 	                        } else {
 	                            System.out.println("Produto não localizado.");
 	                        }
-	                        stmtUp.close();
 	                        break;
 
 	                    case 4:
@@ -110,14 +102,13 @@ public class Produto {
 	                        String sqlDel = "DELETE FROM PRODUTO WHERE CODIGO = ?";
 	                        PreparedStatement stmtDele = conexao.prepareStatement(sqlDel);
 	                        stmtDele.setInt(1, coddelete);
-
 	                        int linhaAfetada2 = stmtDele.executeUpdate();
+
 	                        if (linhaAfetada2 > 0) {
 	                            System.out.println("Deletado com sucesso!");
 	                        } else {
 	                            System.out.println("Produto não localizado.");
 	                        }
-	                        stmtDele.close();
 	                        break;
 
 	                    case 0:
@@ -125,16 +116,17 @@ public class Produto {
 	                        break;
 
 	                    default:
-	                        System.out.println("Opção inválida!");
+	                        System.out.println("Opção inválida.");
 	                }
 	            }
+
 	            conexao.close();
 	            sc.close();
+
 	        } catch (Exception e) {
 	            System.out.println("Erro: " + e.getMessage());
 	        }
 	    }
-	
+	}
 
-	
-}
+
